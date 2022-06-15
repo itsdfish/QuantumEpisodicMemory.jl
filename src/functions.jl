@@ -240,3 +240,28 @@ function 𝕦(θ)
 	return [cos(θ) -sin(θ)
 		sin(θ) cos(θ)]
 end
+
+"""
+    to_table(x)
+
+Converts matrix to table with labeled dimensions and indices. 
+
+# Example
+```julia
+4×3 Named Matrix{Float64}
+condition ╲ word type │       old    related  unrelated
+──────────────────────┼────────────────────────────────
+gist                  │  0.690462   0.545336  0.0359636
+verbatim              │  0.575113   0.425675   0.093524
+verbatim+gist         │  0.694898   0.551852  0.0497793
+unrelated new         │  0.455457   0.604619   0.887783
+```
+"""
+function to_table(x)
+    return NamedArray(
+        x, 
+        (["gist","verbatim", "verbatim+gist","unrelated new"],
+        ["old","related","unrelated"]),
+        ("condition","word type"),
+    )
+end
