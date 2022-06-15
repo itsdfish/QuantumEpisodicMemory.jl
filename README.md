@@ -9,6 +9,14 @@ This repository constains Julia code for the Generalized Quantum Episodic Memory
 
 The law of total probability is violated in experiments, such that Pr(G) + Pr(V) > P(GV). Similarly, the judgments are subadditive: Pr(G) + Pr(V) + Pr(U) > 1. These effects emerge in the GQEM because the memory representations are incompatible, meaning they are represented with different, non-orthogonal bases and evaluated sequentially. As a result, LOTP and additivity do not necessarily hold. 
 
+# Installation
+
+To install from the REPL, use `]` to switch to the package mode and enter the following:
+
+```julia
+add https://github.com/itsdfish/QuantumEpisodicMemory.jl
+```
+
 # Documentation
 Switch to help mode in the REPL with and type a function name, such as rand, pdf, logpdf, compute_preds, GQEM, to_table. For example,
 ```julia
