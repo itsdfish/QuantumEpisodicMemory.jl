@@ -262,7 +262,7 @@ unrelated new         │  0.455457   0.604619   0.887783
 function to_table(x)
     return NamedArray(
         x, 
-        (["gist","verbatim", "gist + verbatim","unrelated new"],
+        (["gist","verbatim", "gist+verbatim","unrelated new"],
         ["old","related","unrelated"]),
         ("condition","word type"),
     )

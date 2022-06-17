@@ -63,9 +63,9 @@ preds = compute_preds(dist)
 table = to_table(preds)
 
 # violation of LOPT
-@show sum(table[["gist","verbatim"],:], dims=1)
+sum(table[["gist","verbatim"],:], dims=1)
 
-table["verbatim+gist", :]'
+table["gist+verbatim", :]'
 ```
 # References 
 
