@@ -13,6 +13,7 @@ SafeTestsets = "1bc83da4-3b8d-516f-aca4-4fe02f6d838f"
 [compat]
 ConcreteStructs = "0.2.0"
 Distributions = "0.25.62"
+NamedArrays = "0.9"
 SafeTestsets = "0.0.1"
 julia = "1"
 
