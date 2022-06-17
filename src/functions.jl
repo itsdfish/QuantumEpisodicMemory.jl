@@ -158,24 +158,26 @@ columns correspond to word type:
 | condition       | old       | related | unrelated |
 | gist            | 3         | 5       | 9         |
 | verbatim        | 0         | 1       | 2         |
-| Gist + verbatim | 4         | 1       | 10        |
+| gist + verbatim | 4         | 1       | 10        |
 | unrelated new   | 5         | 8       | 2         |
 
 # Arguments
 
 - `dist`: GQEM distribution object
 """
+function rand(dist::GQEM, n::Array{Int,N}) where {N}
+    preds = compute_preds(dist)
+    return @. rand(Binomial(n, preds))
+end
+
 function rand(dist::GQEM, n::Int)
     preds = compute_preds(dist)
     return @. rand(Binomial(n, preds))
 end
 
-function rand(dist::GQEM, n::Array{Int,N}) where {N}
-    preds = compute_preds(dist)
-    return @. rand(Binomial(n, preds))
-end
+
 """
-logpdf(dist::GQEM, n::Union{Int,Array{Int,N}}, data::Array{Int,N})
+    logpdf(dist::GQEM, n::Union{Int,Array{Int,N}}, data::Array{Int,N})
 
 Returns the log likelihood of the data for the GQEM model.
 
@@ -187,7 +189,7 @@ columns correspond to word type:
 | condition       | old       | related | unrelated |
 | gist            | 3         | 5       | 9         |
 | verbatim        | 0         | 1       | 2         |
-| Gist + verbatim | 4         | 1       | 10        |
+| gist + verbatim | 4         | 1       | 10        |
 | unrelated new   | 5         | 8       | 2         |
 
 # Arguments
@@ -202,7 +204,7 @@ function logpdf(dist::GQEM, n::Union{Int,Array{Int,N}}, data::Array{Int,N}) wher
 end
 
 """
-pdf(dist::GQEM, n::Union{Int,Array{Int,N}}, data::Array{Int,N})
+    pdf(dist::GQEM, n::Union{Int,Array{Int,N}}, data::Array{Int,N})
 
 Returns the likelihood of the data for the GQEM model.
 
@@ -214,7 +216,7 @@ columns correspond to word type:
 | condition       | old       | related | unrelated |
 | gist            | 3         | 5       | 9         |
 | verbatim        | 0         | 1       | 2         |
-| Gist + verbatim | 4         | 1       | 10        |
+| gist + verbatim | 4         | 1       | 10        |
 | unrelated new   | 5         | 8       | 2         |
 
 # Arguments
@@ -253,14 +255,14 @@ condition ╲ word type │       old    related  unrelated
 ──────────────────────┼────────────────────────────────
 gist                  │  0.690462   0.545336  0.0359636
 verbatim              │  0.575113   0.425675   0.093524
-verbatim+gist         │  0.694898   0.551852  0.0497793
+gist + verbatim       │  0.694898   0.551852  0.0497793
 unrelated new         │  0.455457   0.604619   0.887783
 ```
 """
 function to_table(x)
     return NamedArray(
         x, 
-        (["gist","verbatim", "verbatim+gist","unrelated new"],
+        (["gist","verbatim", "gist + verbatim","unrelated new"],
         ["old","related","unrelated"]),
         ("condition","word type"),
     )
