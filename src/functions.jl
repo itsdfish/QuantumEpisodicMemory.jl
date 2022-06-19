@@ -102,10 +102,10 @@ function prob_unrelated(θN, θψ)
 
     # initial state relative to V
     ψ = 𝕦(θψ) * V
-    # projector matrix for verbatim trace
+    # projector matrix for unrelated trace
     MN = N * N'
 
-    # projection onto verbatim trace
+    # projection onto unrelated trace
     proj_N = MN * ψ
     # probability of responding unrelated new
     return proj_N' * proj_N

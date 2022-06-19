@@ -8,11 +8,11 @@ import Distributions: logpdf, pdf, rand
 
 # Fields
 
-- `θG`: angle in radians between verbatim and gist bases 
-- `θN`: angle in radians between verbatim and new unrelated bases 
-- `θψO`: angle in radians between verbatim basis and superposition for old words
-- `θψR`: angle in radians between verbatim basis and superposition for related new words 
-- `θψN`: angle in radians between verbatim basis and  superposition for new unrelated words
+- `θG`: angle in radians between the verbatim and gist bases 
+- `θN`: angle in radians between the verbatim and new unrelated bases 
+- `θψO`: angle in radians between verbatim basis and the initial state for old words
+- `θψR`: angle in radians between verbatim basis and the initial state for related new words 
+- `θψN`: angle in radians between verbatim basis and the initial state for new unrelated words
 
 # Reference 
 
