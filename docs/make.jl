@@ -16,7 +16,7 @@ makedocs(
     ),
     modules = [
         QuantumEpisodicMemory
-        # Base.get_extension(QuantumEpisodicMemory, :TuringExt),
-        # Base.get_extension(QuantumEpisodicMemory, :PlotsExt)
+    # Base.get_extension(QuantumEpisodicMemory, :TuringExt),
+    # Base.get_extension(QuantumEpisodicMemory, :PlotsExt)
     ]
 )
