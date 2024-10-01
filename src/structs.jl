@@ -1,4 +1,4 @@
-abstract type AbstractGQEM <: ContinuousUnivariateDistribution end
+abstract type AbstractGQEM <: DiscreteUnivariateDistribution end
 """
     GQEM{T<:Real} <: AbstractGQEM
 
