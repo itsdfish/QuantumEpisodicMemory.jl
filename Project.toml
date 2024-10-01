@@ -1,19 +1,19 @@
 name = "QuantumEpisodicMemory"
 uuid = "aeb53088-f60c-46c6-a6bd-4c0674b6a013"
 authors = ["itsdfish"]
-version = "0.1.0"
+version = "0.1.1"
 
 [deps]
-ConcreteStructs = "2569d6c7-a4a2-43d3-a901-331e8e4be471"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 NamedArrays = "86f7a689-2022-50b4-a561-43c23ac3c673"
+PrettyTables = "08abe8d2-0d0c-5749-adfa-8a2ac140af0d"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 SafeTestsets = "1bc83da4-3b8d-516f-aca4-4fe02f6d838f"
 
 [compat]
-ConcreteStructs = "0.2.0"
 Distributions = "0.25.62"
 NamedArrays = "0.9, 0.10"
+PrettyTables = "2"
 SafeTestsets = "0.0.1, 0.1"
 julia = "1"
 

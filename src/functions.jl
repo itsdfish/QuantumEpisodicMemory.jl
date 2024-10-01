@@ -9,8 +9,8 @@ Probability of accepting a word in the verbatim + gist instruction condition.
 """
 function prob_gist_verbatim(θG, θψ)
     # basis vectors for verbatim
-    V = [1,0]
-    V̅ = [0,1]
+    V = [1, 0]
+    V̅ = [0, 1]
     # basis vectors for gist 
     G = 𝕦(θG) * V
     G̅ = 𝕦(θG) * V̅
@@ -31,7 +31,7 @@ function prob_gist_verbatim(θG, θψ)
     # projection onto compliment of gist trace then verbatim trace 
     proj_VG = MV * MG̅ * ψ
     # probability of retrieving gist + prob not retrieving gist and verbatim
-    return proj_G' * proj_G + proj_VG' * proj_VG 
+    return proj_G' * proj_G + proj_VG' * proj_VG
 end
 
 """
@@ -45,7 +45,7 @@ Probability of accepting a word in the verbatim instruction condition.
 """
 function prob_verbatim(θψ)
     # basis vector for verbatim
-    V = [1,0]
+    V = [1, 0]
 
     # initial state relative to V
     ψ = 𝕦(θψ) * V
@@ -70,7 +70,7 @@ Probability of accepting a word in the gist instruction condition.
 """
 function prob_gist(θG, θψ)
     # basis vectors for verbatim
-    V = [1,0]
+    V = [1, 0]
     # basis vector for gist 
     G = 𝕦(θG) * V
 
@@ -96,7 +96,7 @@ Probability of accepting a word in the new unrelated instruction condition.
 """
 function prob_unrelated(θN, θψ)
     # basis vectors for verbatim
-    V = [1,0]
+    V = [1, 0]
     # basis vector for unrelated new 
     N = 𝕦(θN) * V
 
@@ -112,7 +112,7 @@ function prob_unrelated(θN, θψ)
 end
 
 """
-    compute_preds(dist)
+    compute_preds(dist::AbstractGQEM)
 
 Returns a matrix of predictions for the GQEM model. 
 
@@ -129,24 +129,24 @@ columns correspond to word type:
 
 # Arguments
 
-- `dist`: GQEM distribution object
+- `dist::AbstractGQEM`: a GQEM distribution object
 """
-function compute_preds(dist)
-    (;θG, θN, θψO, θψR, θψU) = dist
+function compute_preds(dist::AbstractGQEM)
+    (; θG, θN, θψO, θψR, θψU) = dist
     Ψ = enumerate((θψO, θψR, θψU))
     preds = zeros(4, 3)
-    for (i,θψ) in Ψ
-        preds[1,i] = prob_gist(θG, θψ)
-        preds[2,i] = prob_verbatim(θψ)
-        preds[3,i] = prob_gist_verbatim(θG, θψ)
-        preds[4,i] = prob_unrelated(θN, θψ)
+    for (i, θψ) in Ψ
+        preds[1, i] = prob_gist(θG, θψ)
+        preds[2, i] = prob_verbatim(θψ)
+        preds[3, i] = prob_gist_verbatim(θG, θψ)
+        preds[4, i] = prob_unrelated(θN, θψ)
     end
     preds .= min.(preds, 1.0)
     return preds
 end
 
 """
-    rand(dist::GQEM, n::Union{Int,Array{Int,N}})
+    rand(dist::AbstractGQEM, n::Union{Int,Array{Int,N}})
 
 Generates data from the GQEM model 
 
@@ -163,21 +163,20 @@ columns correspond to word type:
 
 # Arguments
 
-- `dist`: GQEM distribution object
+- `dist::AbstractGQEM`: a GQEM distribution object
 """
-function rand(dist::GQEM, n::Array{Int,N}) where {N}
+function rand(dist::AbstractGQEM, n::Array{Int, N}) where {N}
     preds = compute_preds(dist)
     return @. rand(Binomial(n, preds))
 end
 
-function rand(dist::GQEM, n::Int)
+function rand(dist::AbstractGQEM, n::Int)
     preds = compute_preds(dist)
     return @. rand(Binomial(n, preds))
 end
 
-
 """
-    logpdf(dist::GQEM, n::Union{Int,Array{Int,N}}, data::Array{Int,N})
+    logpdf(dist::AbstractGQEM, n::Union{Int,Array{Int,N}}, data::Array{Int,N})
 
 Returns the log likelihood of the data for the GQEM model.
 
@@ -194,17 +193,21 @@ columns correspond to word type:
 
 # Arguments
 
-- `dist`: GQEM distribution object
-- `n`: the number of trials 
-- `k`: number of "yes" responses 
+- `dist::AbstractGQEM`: a GQEM distribution object
+- `n::Union{Int, Array{Int, N}}`: the number of trials 
+- `data::Array{Int, N}`: number of "yes" responses 
 """
-function logpdf(dist::GQEM, n::Union{Int,Array{Int,N}}, data::Array{Int,N}) where {N}
+function logpdf(
+    dist::AbstractGQEM,
+    n::Union{Int, Array{Int, N}},
+    data::Array{Int, N}
+) where {N}
     preds = compute_preds(dist)
     return sum(@. logpdf(Binomial(n, preds), data))
 end
 
 """
-    pdf(dist::GQEM, n::Union{Int,Array{Int,N}}, data::Array{Int,N})
+    pdf(dist::AbstractGQEM, n::Union{Int,Array{Int,N}}, data::Array{Int,N})
 
 Returns the likelihood of the data for the GQEM model.
 
@@ -221,11 +224,15 @@ columns correspond to word type:
 
 # Arguments
 
-- `dist`: GQEM distribution object
-- `n`: the number of trials 
-- `k`: number of "yes" responses 
+- `dist::AbstractGQEM`: a GQEM distribution object
+- `n::Union{Int, Array{Int, N}}`: the number of trials 
+- `data::Array{Int, N}`: number of "yes" responses 
 """
-function pdf(dist::GQEM, n::Union{Int,Array{Int,N}}, data::Array{Int,N}) where {N}
+function pdf(
+    dist::AbstractGQEM,
+    n::Union{Int, Array{Int, N}},
+    data::Array{Int, N}
+) where {N}
     return logpdf(dist, n, data) |> exp
 end
 
@@ -239,8 +246,8 @@ Unitary transformation matrix.
 - `θ`: angle in radians
 """
 function 𝕦(θ)
-	return [cos(θ) -sin(θ)
-		sin(θ) cos(θ)]
+    return [cos(θ) -sin(θ)
+        sin(θ) cos(θ)]
 end
 
 """
@@ -261,9 +268,9 @@ unrelated new         │  0.455457   0.604619   0.887783
 """
 function to_table(x)
     return NamedArray(
-        x, 
-        (["gist","verbatim", "gist+verbatim","unrelated new"],
-        ["old","related","unrelated"]),
-        ("condition","word type"),
+        x,
+        (["gist", "verbatim", "gist+verbatim", "unrelated new"],
+            ["old", "related", "unrelated"]),
+        ("condition", "word type")
     )
 end

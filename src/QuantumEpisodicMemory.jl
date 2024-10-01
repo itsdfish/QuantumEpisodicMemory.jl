@@ -29,8 +29,7 @@ help?> GQEM
 ```julia
 using QuantumEpisodicMemory
 
-# basis rotation parameters relative to the standard verbatim
-# basis, V
+# basis rotation parameters relative to the standard verbatim basis, V
 θG = -.12
 θN = -1.54
 θψO = -.71
@@ -54,12 +53,22 @@ Cognitive Science, 41(8), 2089-2125.
 """
 module QuantumEpisodicMemory
 
-    using Distributions, ConcreteStructs, NamedArrays
-    import Distributions: logpdf, pdf, rand 
+using Distributions
+using NamedArrays
+using PrettyTables
 
-    export GQEM, pdf, logpdf, rand, compute_preds
-    export to_table
+import Distributions: logpdf
+import Distributions: pdf
+import Distributions: rand
 
-    include("structs.jl")
-    include("functions.jl")
+export GQEM
+export pdf
+export logpdf
+export rand
+export compute_preds
+export to_table
+
+include("structs.jl")
+include("functions.jl")
+include("utilities.jl")
 end

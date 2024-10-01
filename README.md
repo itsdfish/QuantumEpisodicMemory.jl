@@ -49,23 +49,27 @@ search: GQEM
 ```julia
 using QuantumEpisodicMemory
 
-# basis rotation parameters relative to the standard verbatim
-# basis, V
+# basis rotation parameters relative to the standard verbatim basis, V
 θG = -.12
 θN = -1.54
 θψO = -.71
 θψR = -.86
 θψU = 1.26
 
-dist = GQEM(;θG, θN, θψO, θψR, θψU)
+dist = GQEM(; θG, θN, θψO, θψR, θψU)
 preds = compute_preds(dist)
 
 table = to_table(preds)
 
 # violation of LOPT
-sum(table[["gist","verbatim"],:], dims=1)
+sum(table[["gist","verbatim"],:], dims=1) - table["gist+verbatim", :]'
+```
 
-table["gist+verbatim", :]'
+```julia 
+1×3 Named Matrix{Float64}
+condition ╲ word type │       old    related  unrelated
+──────────────────────┼────────────────────────────────
+sum(condition)        │  0.570677   0.419159  0.0797084
 ```
 # References 
 
