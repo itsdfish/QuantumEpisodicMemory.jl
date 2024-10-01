@@ -17,34 +17,9 @@ To install from the REPL, use `]` to switch to the package mode and enter the fo
 add https://github.com/itsdfish/QuantumEpisodicMemory.jl
 ```
 
-# Documentation
-Switch to help mode in the REPL with and type a function name, such as rand, pdf, logpdf, compute_preds, GQEM, to_table. For example,
-```julia
-help?> GQEM
-search: GQEM
-
-  GQEM
-
-  Fields
-  ≡≡≡≡≡≡≡≡
-
-    •  θG: angle in radians between the verbatim and gist bases
-
-    •  θN: angle in radians between the verbatim and new unrelated bases
-
-    •  θψO: angle in radians between the verbatim basis and the initial state for old words
-
-    •  θψR: angle in radians between the verbatim basis and and the initial state for related new words
-
-    •  θψN: angle in radians between the verbatim basis and and the initial state for new unrelated words
-
-  Reference
-  ≡≡≡≡≡≡≡≡≡≡≡
-
-  Trueblood, J. S., & Hemmer, P. (2017). The generalized quantum episodic memory model. Cognitive Science, 41(8), 2089-2125.
-```
-
 # Example
+
+The following example shows a violation of the total law of probability. 
 
 ```julia
 using QuantumEpisodicMemory
@@ -71,6 +46,7 @@ condition ╲ word type │       old    related  unrelated
 ──────────────────────┼────────────────────────────────
 sum(condition)        │  0.570677   0.419159  0.0797084
 ```
+
 # References 
 
 Trueblood, J. S., & Hemmer, P. (2017). The generalized quantum episodic memory model.
