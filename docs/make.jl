@@ -22,6 +22,6 @@ makedocs(
     pages = [
         "Home" => "index.md",
         "Parameter Estimation" => "parameter_estimation.md",
-        "Plots" => "plots.md",
+        "Plots" => "plots.md"
     ]
 )

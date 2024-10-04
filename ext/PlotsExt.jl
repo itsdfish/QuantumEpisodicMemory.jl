@@ -92,7 +92,7 @@ function plot_state!(model_plot, ψ; label, font_size, kwargs...)
         model_plot,
         [0, ψ[1]],
         [0, ψ[2]];
-        color = RGB(161/256, 105/256, 101/256),
+        color = RGB(161 / 256, 105 / 256, 101 / 256),
         arrow = arrow(:closed, 0.50),
         #linewidth = 2,
         #linestyle = :dot,
@@ -116,7 +116,7 @@ function plot_projection!(model_plot, proj; kwargs...)
         [0, proj[2]];
         arrow = arrow(:closed, 0.50),
         linewidth = 2,
-        color = RGB(136/256, 168/256, 138/256),
+        color = RGB(136 / 256, 168 / 256, 138 / 256),
         #linestyle = :dot,
         kwargs...
     )
