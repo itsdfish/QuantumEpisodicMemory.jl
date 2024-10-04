@@ -143,7 +143,6 @@ post_plot = plot(chains, grid = false)
 vline!(post_plot, [missing .65 missing .15 missing .15 missing .05 missing .10], color = :black, linestyle = :dash)
 ```
 
-![](assets/posterior_distribution.png)
 
 The data-generating parameters are represented as black vertical lines in the density plots. As expected, the posterior distributions are centered near the data-generating parameters. Given that the data-generating and estimated model are the same, we would expect the posterior distributions to be near the data-generating parameters. 
 
