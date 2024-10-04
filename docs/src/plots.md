@@ -1,6 +1,3 @@
-```@raw html
-<img src="https://raw.githubusercontent.com/itsdfish/TrueAndErrorModels.jl/gh-pages/dev/assets/logo_readme.png" alt="drawing" width="900"/>
-```
 # Visualizing The Model Predictions
 
 This tutorial demonstrates how to visualize the predictions of the GQEM. When `Plots` is loaded into your session along with `QuantumEpisodicMemory`, a method for the function `plot` is loaded, allowing one to visualize the model predictions as projections within a unit circle.
