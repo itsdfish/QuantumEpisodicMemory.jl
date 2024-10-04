@@ -5,7 +5,7 @@ This repository constains Julia code for the Generalized Quantum Episodic Memory
 
 1. gist: respond "yes" to semantically related words (G)
 2. verbatim: respond "yes" to old (i.e. studied) words (V)
-3. gist + verbatim: respond "yes" to semantically related and old words (GV)
+3. gist + verbatim: respond "yes" to semantically related and old words (G ∪ V)
 4. unrelated: respond "yes" to unrelated words (U)
 
 The law of total probability is violated in experiments, such that Pr(G) + Pr(V) > Pr(G ∪ V). Similarly, the judgments are subadditive: Pr(G) + Pr(V) + Pr(U) > 1. These effects emerge in the GQEM because the memory representations are incompatible, meaning they are represented with different, non-orthogonal bases and evaluated sequentially. As a result, LOTP and additivity do not necessarily hold. 
@@ -57,12 +57,15 @@ using Distributions
 using NamedArrays
 using PrettyTables
 
+import Distributions: loglikelihood
 import Distributions: logpdf
 import Distributions: pdf
 import Distributions: rand
 
+export AbstractGQEM
 export GQEM
 export pdf
+export loglikelihood
 export logpdf
 export rand
 export compute_preds

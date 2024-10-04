@@ -1,10 +1,10 @@
 using Documenter
 using QuantumEpisodicMemory
+using Plots
 
 makedocs(
     warnonly = true,
     sitename = "QuantumEpisodicMemory",
-    format = Documenter.HTML(),
     format = Documenter.HTML(
         assets = [
             asset(
@@ -18,5 +18,10 @@ makedocs(
         QuantumEpisodicMemory
     # Base.get_extension(QuantumEpisodicMemory, :TuringExt),
     # Base.get_extension(QuantumEpisodicMemory, :PlotsExt)
+    ],
+    pages = [
+        "Home" => "index.md",
+        "Parameter Estimation" => "parameter_estimation.md",
+        "Plots" => "plots.md",
     ]
 )
