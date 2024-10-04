@@ -25,3 +25,5 @@ makedocs(
         "Plots" => "plots.md"
     ]
 )
+
+deploydocs(repo = "github.com/itsdfish/QuantumEpisodicMemory.jl.git")
