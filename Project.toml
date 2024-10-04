@@ -5,6 +5,7 @@ version = "0.2.0"
 
 [deps]
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
+LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
 NamedArrays = "86f7a689-2022-50b4-a561-43c23ac3c673"
 PrettyTables = "08abe8d2-0d0c-5749-adfa-8a2ac140af0d"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
@@ -12,7 +13,6 @@ SafeTestsets = "1bc83da4-3b8d-516f-aca4-4fe02f6d838f"
 
 [weakdeps]
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
-LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
 
 [extensions]
 PlotsExt = "Plots"
