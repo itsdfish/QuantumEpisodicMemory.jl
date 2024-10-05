@@ -17,12 +17,14 @@ makedocs(
     modules = [
         QuantumEpisodicMemory
     # Base.get_extension(QuantumEpisodicMemory, :TuringExt),
-    # Base.get_extension(QuantumEpisodicMemory, :PlotsExt)
+        Base.get_extension(QuantumEpisodicMemory, :PlotsExt)
     ],
     pages = [
         "Home" => "index.md",
+        "Model Description" => "model_description.md",
         "Parameter Estimation" => "parameter_estimation.md",
-        "Plots" => "plots.md"
+        "Plots" => "plots.md",
+        "API" => "api.md",
     ]
 )
 

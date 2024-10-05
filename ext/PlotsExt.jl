@@ -1,16 +1,20 @@
 module PlotsExt
 
 using LaTeXStrings
-using QuantumEpisodicMemory
 using Plots
+using Plots.PlotMeasures
+using QuantumEpisodicMemory
 
 import Plots: plot
+import Plots: plot!
+
 using QuantumEpisodicMemory: 𝕦
 
 """
     plot(dist::AbstractGQEM; font_size = 10, kwargs...)
 
-Plots the projection of an `AbstractGQEM` model as a set of unit circles. 
+Plots the projection of an `AbstractGQEM` model as a 3 x 3 set of unit circles. Across all unit circles, 
+the bases are the same. However, the state vector varies by row and the basis vector onto which the state vector is projected varies by column. 
 
 # Arguments
 
@@ -20,33 +24,142 @@ Plots the projection of an `AbstractGQEM` model as a set of unit circles.
 
 - `font_size = 10`: font size of the vector labels 
 - `kwargs...`: optional keyword arguments passed to the `plot` functions 
+
+# Example 
+
+```julia 
+dist = GQEM(; 
+    θG = -.5,
+    θU = 2,
+    θψO = .90,
+    θψR = .15,
+    θψU = -1.5,
+)
+       
+plot(dist)
+```
 """
 function plot(dist::AbstractGQEM; font_size = 10, kwargs...)
     plots = Plots.Plot[]
     (; θG, θU, θψO, θψR, θψU) = dist
     θV = 0.0
     Ψ = enumerate((θψO, θψR, θψU))
-    my_cgrad = cgrad([:black, :grey], 3)
-    _model_plot = plot_circle(1; kwargs...)
-    plot_bases!(_model_plot, θG; label = "G", color = my_cgrad[1], font_size, kwargs...)
-    plot_bases!(_model_plot, 0; label = "V", color = my_cgrad[2], font_size, kwargs...)
-    plot_bases!(_model_plot, θU; label = "U", color = my_cgrad[3], font_size, kwargs...)
-    basis_theta = (θV, θG, θU)
+    θ_basis = (θV, θG, θU)
     state_labels = (L"\psi_V", L"\psi_G", L"\psi_U")
+    _model_plot = setup_bases(dist; font_size, kwargs...)
     # iterate over the state vectors 
     for (i, θψ) ∈ Ψ
         # iterate over projections
         for j ∈ 1:3
             model_plot = deepcopy(_model_plot)
-            ψ = compute_state(θψ)
-            plot_state!(model_plot, ψ; label = state_labels[i], font_size, kwargs...)
-            proj = compute_projection(basis_theta[j], ψ)
-            plot_projection!(model_plot, proj; kwargs...)
-            plot_projector!(model_plot, proj, ψ; kwargs...)
+
+            model_plot = plot!(
+                dist,
+                model_plot,
+                θψ,
+                θ_basis[j];
+                state_label = state_labels[i],
+                font_size,
+                kwargs...
+            )
             push!(plots, model_plot)
         end
     end
-    return plot(plots...; size = (1200, 800))
+    return plot(
+        plots...;
+        top_margin = 5mm,
+        bottom_margin = 2mm,
+        right_margin = -2mm,
+        left_margin = -2mm,
+        size = (1200, 800)
+    )
+end
+
+function plot!(
+    dist::AbstractGQEM,
+    model_plot,
+    θψ,
+    θ_basis;
+    state_label = L"\ket{\psi}",
+    font_size = 10,
+    kwargs...
+)
+
+    ψ = compute_state(θψ)
+    plot_state!(model_plot, ψ; label = state_label, font_size, kwargs...)
+    proj = compute_projection(θ_basis, ψ)
+    plot_projection!(model_plot, proj; kwargs...)
+    plot_projector!(model_plot, proj, ψ; kwargs...)
+    return model_plot
+end
+
+"""
+    plot(
+        dist::AbstractGQEM,
+        θψ,
+        θ_basis;
+        state_label = L"psi",
+        font_size = 10,
+        kwargs...
+    )
+
+Plots the projection from a given state vector onto a given basis vector within a unit circle. 
+
+# Arguments
+
+- `dist::AbstractGQEM`: a GQEM distribution object
+- `θψ`: the angle of the state vector with respect to the verbatim basis 
+- `θ_basis`: the angle of the basis onto which the state vector is projected. The angle
+    is with respect to the verbatim basis.
+
+# Keywords 
+
+- `state_label = "L"psi"`: the label of the state vector ket
+- `font_size = 10`: font size of the vector labels 
+- `kwargs...`: optional keyword arguments passed to the `plot` functions 
+
+# Example 
+
+```julia 
+dist = GQEM(; 
+    θG = -.5,
+    θU = 2,
+    θψO = .90,
+    θψR = .15,
+    θψU = -1.5,
+)
+       
+plot(dist, .1, -.5)
+```
+"""
+function plot(
+    dist::AbstractGQEM,
+    θψ,
+    θ_basis;
+    state_label = L"\psi",
+    font_size = 10,
+    kwargs...
+)
+    model_plot = setup_bases(dist; font_size, kwargs...)
+    return plot!(
+        dist,
+        model_plot,
+        θψ,
+        θ_basis;
+        state_label,
+        font_size = 10,
+        kwargs...
+    )
+end
+
+function setup_bases(dist; font_size, kwargs...)
+    (; θG, θU) = dist
+    my_cgrad = cgrad([:black, :grey], 3)
+    _model_plot = plot_circle(1; margin = -2mm, kwargs...)
+    plot_bases!(_model_plot, θG; label = "G", color = my_cgrad[1], font_size, kwargs...)
+    plot_bases!(_model_plot, 0; label = "V", color = my_cgrad[2], font_size, kwargs...)
+    plot_bases!(_model_plot, θU; label = "U", color = my_cgrad[3], font_size, kwargs...)
+    return _model_plot
 end
 
 function plot_circle(r; kwargs...)
@@ -60,6 +173,8 @@ function plot_circle(r; kwargs...)
         grid = false,
         aspect_ratio = 1,
         framestyle = :none;
+        xaxis = nothing,
+        yaxis = nothing,
         kwargs...
     )
 end
@@ -94,8 +209,6 @@ function plot_state!(model_plot, ψ; label, font_size, kwargs...)
         [0, ψ[2]];
         color = RGB(161 / 256, 105 / 256, 101 / 256),
         arrow = arrow(:closed, 0.50),
-        #linewidth = 2,
-        #linestyle = :dot,
         kwargs...
     )
     annotate!(
@@ -117,7 +230,10 @@ function plot_projection!(model_plot, proj; kwargs...)
         arrow = arrow(:closed, 0.50),
         linewidth = 2,
         color = RGB(136 / 256, 168 / 256, 138 / 256),
-        #linestyle = :dot,
+        top_margin = 5mm,
+        bottom_margin = 2mm,
+        right_margin = -5mm,
+        left_margin = -2mm,
         kwargs...
     )
     return model_plot
