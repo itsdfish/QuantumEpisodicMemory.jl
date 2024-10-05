@@ -84,7 +84,6 @@ function plot!(
     font_size = 10,
     kwargs...
 )
-
     ψ = compute_state(θψ)
     plot_state!(model_plot, ψ; label = state_label, font_size, kwargs...)
     proj = compute_projection(θ_basis, ψ)
