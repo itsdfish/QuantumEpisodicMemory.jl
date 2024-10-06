@@ -1,7 +1,6 @@
 #
-<img src="https://raw.githubusercontent.com/itsdfish/QuantumEpisodicMemory.jl/gh-pages/dev/assets/logo_readme.png" alt="drawing" width="900"/>
+<img src="https://raw.githubusercontent.com/itsdfish/QuantumEpisodicMemory.jl/refs/heads/main/docs/logo/logo_readme.png" alt="drawing" width="900"/>
 
-# QuantumEpisodicMemory
 
 This repository constains Julia code for the Generalized Quantum Episodic Memory (GQEM) model of item recognition. In the recognition memory task, subjects study a list of words. In the test phase, three types of words are presented: old words from the study list, new but semantically related words, and new but unrelated words. Subjects are given four sets of instructions
 

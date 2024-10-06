@@ -13,7 +13,7 @@ r = 175
 arrowheadlength = 30
 linewidth = 3
 
-origin_point = Point(-1500, 15)
+origin_point = Point(-1505, 15)
 
 b1 = [1, 0]
 b1′ = [0, -1]
@@ -55,8 +55,13 @@ arrow(origin_point, line4_end; linewidth, arrowheadlength)
 strokepath()
 
 # line 5
-sethue((0.796, 0.235, 0.200))
+sethue((0.220, 0.596, 0.200))
 arrow(origin_point, line5_end; linewidth, arrowheadlength)
+strokepath()
+
+# line 6
+sethue((0.796, 0.235, 0.200))
+arrow(Point(-1850, 0), Point(-1800, 0); linewidth, arrowheadlength)
 strokepath()
 
 # text
