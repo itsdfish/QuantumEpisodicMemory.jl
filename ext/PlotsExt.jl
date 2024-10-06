@@ -45,7 +45,7 @@ function plot(dist::AbstractGQEM; font_size = 10, kwargs...)
     θV = 0.0
     Ψ = enumerate((θψO, θψR, θψU))
     θ_basis = (θV, θG, θU)
-    state_labels = (L"\psi_V", L"\psi_G", L"\psi_U")
+    state_labels = (L"\psi_O", L"\psi_R", L"\psi_U")
     _model_plot = setup_bases(dist; font_size, kwargs...)
     # iterate over the state vectors 
     for (i, θψ) ∈ Ψ
@@ -68,7 +68,7 @@ function plot(dist::AbstractGQEM; font_size = 10, kwargs...)
     return plot(
         plots...;
         top_margin = 5mm,
-        bottom_margin = 2mm,
+        bottom_margin = 4mm,
         right_margin = -2mm,
         left_margin = -2mm,
         size = (1200, 800)
@@ -174,6 +174,7 @@ function plot_circle(r; kwargs...)
         framestyle = :none;
         xaxis = nothing,
         yaxis = nothing,
+        lims = (-1.05, 1.05),
         kwargs...
     )
 end
@@ -182,7 +183,7 @@ function plot_basis!(model_plot, b; color, label, font_size, kwargs...)
     plot!(model_plot, [0, b[1]], [0, b[2]]; arrow = arrow(:closed, 0.50), color)
     annotate!(
         model_plot,
-        (b[1] * 1.15, b[2] * 1.15, text(label, font_size, :left, :center, :black))
+        (b[1] * 1.2, b[2] * 1.2, text(label, font_size, :left, :center, :black))
     )
     return nothing
 end
@@ -227,7 +228,7 @@ function plot_projection!(model_plot, proj; kwargs...)
         [0, proj[1]],
         [0, proj[2]];
         arrow = arrow(:closed, 0.50),
-        linewidth = 2,
+        linewidth = 2.5,
         color = RGB(136 / 256, 168 / 256, 138 / 256),
         top_margin = 5mm,
         bottom_margin = 2mm,

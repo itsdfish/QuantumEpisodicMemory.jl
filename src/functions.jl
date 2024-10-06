@@ -1,4 +1,38 @@
 """
+    compute_preds(dist::AbstractGQEM)
+
+Returns a matrix of predictions for the GQEM model. 
+
+The output is organized in a matrix where rows correspond to instructions and 
+columns correspond to word type:
+
+|                 | word type |         |           |
+|-----------------|-----------|---------|-----------|
+| condition       | old       | related | unrelated |
+| gist            | 0.65      | 0.65    | 0.9       |
+| verbatim        | 0.35      | 0.35    | 0.65      |
+| Gist + verbatim | 0.69      | 0.69    | 0.91      |
+| unrelated new   | 0.9       | 0.9     | 1         |
+
+# Arguments
+
+- `dist::AbstractGQEM`: a GQEM distribution object
+"""
+function compute_preds(dist::AbstractGQEM{T}) where {T}
+    (; θG, θU, θψO, θψR, θψU) = dist
+    Ψ = enumerate((θψO, θψR, θψU))
+    preds = zeros(T, 4, 3)
+    for (i, θψ) in Ψ
+        preds[1, i] = prob_gist(θG, θψ)
+        preds[2, i] = prob_verbatim(θψ)
+        preds[3, i] = prob_gist_verbatim(θG, θψ)
+        preds[4, i] = prob_unrelated(θU, θψ)
+    end
+    preds .= min.(preds, 1.0)
+    return preds
+end
+
+"""
     prob_verbatim(θψ)
 
 Probability of accepting a word in the verbatim + gist instruction condition. 
@@ -26,7 +60,7 @@ function prob_gist_verbatim(θG, θψ)
     proj_G = MG * ψ
     # projection onto compliment of gist trace then verbatim trace 
     proj_VG = MV * MG̅ * ψ
-    # probability of retrieving gist + prob not retrieving gist and verbatim
+    # probability of retrieving gist + prob not retrieving gist and retrieving verbatim
     return proj_G' * proj_G + proj_VG' * proj_VG
 end
 
@@ -103,40 +137,6 @@ function prob_unrelated(θU, θψ)
     proj_N = MN * ψ
     # probability of responding unrelated new
     return proj_N' * proj_N
-end
-
-"""
-    compute_preds(dist::AbstractGQEM)
-
-Returns a matrix of predictions for the GQEM model. 
-
-The output is organized in a matrix where rows correspond to instructions and 
-columns correspond to word type:
-
-|                 | word type |         |           |
-|-----------------|-----------|---------|-----------|
-| condition       | old       | related | unrelated |
-| gist            | 0.65      | 0.65    | 0.9       |
-| verbatim        | 0.35      | 0.35    | 0.65      |
-| Gist + verbatim | 0.69      | 0.69    | 0.91      |
-| unrelated new   | 0.9       | 0.9     | 1         |
-
-# Arguments
-
-- `dist::AbstractGQEM`: a GQEM distribution object
-"""
-function compute_preds(dist::AbstractGQEM{T}) where {T}
-    (; θG, θU, θψO, θψR, θψU) = dist
-    Ψ = enumerate((θψO, θψR, θψU))
-    preds = zeros(T, 4, 3)
-    for (i, θψ) in Ψ
-        preds[1, i] = prob_gist(θG, θψ)
-        preds[2, i] = prob_verbatim(θψ)
-        preds[3, i] = prob_gist_verbatim(θG, θψ)
-        preds[4, i] = prob_unrelated(θU, θψ)
-    end
-    preds .= min.(preds, 1.0)
-    return preds
 end
 
 """

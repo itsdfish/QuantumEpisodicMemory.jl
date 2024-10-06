@@ -1,3 +1,6 @@
+#
+<img src="https://raw.githubusercontent.com/itsdfish/QuantumEpisodicMemory.jl/gh-pages/dev/assets/logo_readme.png" alt="drawing" width="900"/>
+
 # Bayesian Parameter Estimation
 
 The purpose of this tutorial is to demonstrate how to perform Bayesian parameter estimation of the True and Error model (TET; Birnbaum & Quispe-Torreblanca, 2018) using the [Turing.jl](https://turinglang.org/) package. 
@@ -67,11 +70,11 @@ where $\mathcal{R}$ and $\mathcal{S}$ correspond to risky and safe options, resp
 ```julia
 @model function model(data)
     θG ~ VonMises(0, π / 2)
-    θN ~ VonMises(0, π / 2)
+    θU ~ VonMises(0, π / 2)
     θψO ~ VonMises(0, π / 2)
     θψR ~ VonMises(0, π / 2)
     θψU ~ VonMises(0, π / 2)
-    data ~ GQEM(; θG, θN, θψO, θψR, θψU)
+    data ~ GQEM(; θG, θU, θψO, θψR, θψU)
 end
 ```
 
