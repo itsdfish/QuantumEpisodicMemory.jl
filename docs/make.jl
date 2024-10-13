@@ -23,6 +23,7 @@ makedocs(
         "Home" => "index.md",
         "Model Description" => "model_description.md",
         "Parameter Estimation" => "parameter_estimation.md",
+        "Model Comparison" => "model_comparison.md",
         "Plots" => "plots.md",
         "API" => "api.md"
     ]

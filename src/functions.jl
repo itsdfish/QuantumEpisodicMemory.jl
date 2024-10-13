@@ -23,10 +23,10 @@ function compute_preds(dist::AbstractGQEM{T}) where {T}
     Ψ = enumerate((θψO, θψR, θψU))
     preds = zeros(T, 4, 3)
     for (i, θψ) in Ψ
-        preds[1, i] = prob_gist(θG, θψ)
-        preds[2, i] = prob_verbatim(θψ)
+        preds[1, i] = compute_prob(θG, θψ)
+        preds[2, i] = compute_prob(0.0, θψ)
         preds[3, i] = prob_gist_verbatim(θG, θψ)
-        preds[4, i] = prob_unrelated(θU, θψ)
+        preds[4, i] = compute_prob(θU, θψ)
     end
     preds .= min.(preds, 1.0)
     return preds
@@ -65,42 +65,20 @@ function prob_gist_verbatim(θG, θψ)
 end
 
 """
-    prob_verbatim(θψ)
+    compute_prob(θ, θψ)
 
-Probability of accepting a word in the verbatim instruction condition. 
-
-# Arguments
-
-- `θψ`: angle in radians between verbatim basis and a superposition
-"""
-function prob_verbatim(θψ)
-    # basis vector for verbatim
-    V = [1, 0]
-    # initial state relative to V
-    ψ = 𝕦(θψ) * V
-    # projector matrix for verbatim trace
-    MV = V * V'
-    # projection onto verbatim trace
-    proj_V = MV * ψ
-    # probability of retrieving verbatim
-    return proj_V' * proj_V
-end
-
-"""
-    prob_gist(θG, θψ)
-
-Probability of accepting a word in the gist instruction condition. 
+Probability of accepting a word. 
 
 # Arguments
 
-- `θG`: angle in radians between verbatim and gist bases 
+- `θ`: angle in radians between verbatim and other bases 
 - `θψ`: angle in radians between verbatim basis and a superposition
 """
-function prob_gist(θG, θψ)
+function compute_prob(θ, θψ)
     # basis vectors for verbatim
     V = [1, 0]
-    # basis vector for gist 
-    G = 𝕦(θG) * V
+    # rotated basis vectors 
+    G = 𝕦(θ) * V
 
     ψ = 𝕦(θψ) * V
     # projector matrix for gist trace
@@ -110,33 +88,6 @@ function prob_gist(θG, θψ)
     proj_G = MG * ψ
     # probability of retrieving gist
     return proj_G' * proj_G
-end
-
-"""
-    prob_unrelated(θU, θψ)
-
-Probability of accepting a word in the new unrelated instruction condition. 
-
-# Arguments
-
-- `θU`: angle in radians between verbatim and new unrelated bases 
-- `θψ`: angle in radians between verbatim basis and a superposition
-"""
-function prob_unrelated(θU, θψ)
-    # basis vectors for verbatim
-    V = [1, 0]
-    # basis vector for unrelated new 
-    N = 𝕦(θU) * V
-
-    # initial state relative to V
-    ψ = 𝕦(θψ) * V
-    # projector matrix for unrelated trace
-    MN = N * N'
-
-    # projection onto unrelated trace
-    proj_N = MN * ψ
-    # probability of responding unrelated new
-    return proj_N' * proj_N
 end
 
 """

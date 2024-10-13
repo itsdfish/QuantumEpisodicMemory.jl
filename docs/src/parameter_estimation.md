@@ -23,7 +23,7 @@ Random.seed!(3320)
 
 ## Generate Data
 
-In the code block below, we will create a model object and generate 2 simulated responses from 100 simulated subjects for a total of 200 responses. For this model, we assume that the probability of a true preference state RR is relatively high, and the probability of other preference states decreases as they become more difference from RR:
+In the code block below, we generate simulated data for parameter estimation. The first portion of the code block generates a `NamedTuple` of the parameters. Next, the parameters are passed to the `GQEM` model constructor. Finally, we generate responses from 100 trials per condition and combine the data inputs into a `Tuple` named data. 
 
 ```julia
 parms = (
@@ -34,10 +34,12 @@ parms = (
     θψU = 1.26,
 )
 dist = GQEM(; parms...)
-n_trials = 1000
+n_trials = 100
 responses = rand(dist, n_trials)
 data = (n_trials, responses)
 ```
+
+To make the responses easier to interpret, we can use `to_table` to add labels to the rows and columns. The rows correspond to experimental conditions and columns correspond to word types.
 
 ```julia 
 table = to_table(responses)
@@ -53,7 +55,9 @@ gist+verbatim         │        64         49          5
 unrelated new         │        46         63         91
 ```
 
-## The Turing Model
+## Turing Model
+
+In the code block below, the Bayesian model is defined using the `@model` macro in Turing. The parameters inside the model function follow a Von Mises distribution, which roughly corresponds to a normal distribution on a circle (i.e., the support is $[-\pi, \pi]$). For each parameter the mean is set to zero, and the concentration parameter, which is inversely related to the variance, is set to a small number of $.10$.
 
 ```julia
 @model function model(data)
@@ -68,23 +72,40 @@ end
 
 ## Estimate the Parameters
 
+Quantum models present challenges for many MCMC samplers because they often produce multimodal posterior distributions. 
+Multimodal distributions can be traced back to the periodic effect of rotating state vectors or bases. As illustrated below, the
+marginal log likelihood of the data vacillates as $\theta_U$ varies across its permissible range. 
+
+![](assets/LL_θU.png)
+```@raw html
+<details>
+<summary><b>Show Code </b></summary>
+```
+```julia 
+θUs = range(-π, π, length = 300)
+LLs = map(θU -> logpdf(GQEM(; parms..., θU), n_trials, responses), θUs)
+plot(θUs, LLs, xlabel = "θU", ylabel = "LL", leg=false, grid=false)
+```
+```@raw html
+</details>
+```
+To overcome limitations of common MCMC samplers, we will use parallel tempering with the package `Pigeons.jl`.  In the code block below,
+we pass the Turing model with the tuple of data to the function `pigeons`. Because the GQEM is highly multimodal, we increase the number of chains 
+from the default of 10 to 20. 
 
 ```julia
 # Estimate parameters
-pt = pigeons(target=TuringLogPotential(
-    model(data)), 
+pt = pigeons(
+    target = TuringLogPotential(model(data)), 
     record = [traces], 
     multithreaded = true, 
     n_chains = 20,
 )
 ```
-
-For ease of intepretation, we will convert the numerical indices of preference vector $\mathbf{p}$ to more informative labeled indices. 
-
 ```julia
 chains = Chains(pt)
 ```
-The output below shows the mean, standard deviation, effective sample size, and rhat for each of the five parameters. The pannel below shows the quantiles of the marginal distributions. 
+The output below shows the mean, standard deviation, effective sample size, and rhat for each of the five parameters. The panel below shows the quantiles of the marginal distributions. 
 ```julia
 Summary Statistics
   parameters      mean       std      mcse   ess_bulk   ess_tail      rhat   ess_per_sec 
@@ -107,22 +128,28 @@ Quantiles
          θψU   -1.9365   -1.8452   -1.2235    1.2722    1.9279
 ```
 
-## Evaluation
+## Posterior Distributions
 
-It is important to verify that the chains converged. We see that the chains converged according to $\hat{r} \leq 1.05$, and the trace plots below show that the chains look like "hairy caterpillars", which indicates the chains did not get stuck. 
+### Mariginal Posterior Distributions 
+
+The marginal posterior distributions below are highly multimodal, as expected.
 
 ```julia
 plot(chains, grid = false)
 ```
 ![](assets/posterior_distributions.png)
 
+### Corner Plots 
+
+Below, we will use corner plots to assess the ability of `Pigeons` to recover the data generating parameters. The corner plots are arranged as a matrix such that the subplot in row i and column j is the join posterior distribution of parameter i and parameter j. The blue horizontal and vertical lines represent the true, data-generating parameter values. For each parameter pair, the blue lines intersect on one of the modes, indicating the parameters were correctly recovered. 
+
 ```julia
 pairplot(chains, PairPlots.Truth(parms))
 ```
 
 ![](assets/pairplots.png)
+
 # References
 
-Birnbaum, M. H., & Quispe-Torreblanca, E. G. (2018). TEMAP2. R: True and error model analysis program in R. Judgment and Decision Making, 13(5), 428-440.
-
-Lee, M. D. (2018). Bayesian methods for analyzing true-and-error models. Judgment and Decision Making, 13(6), 622-635.
+Trueblood, J. S., & Hemmer, P. (2017). The generalized quantum episodic memory model.
+Cognitive Science, 41(8), 2089-2125.

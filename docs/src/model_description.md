@@ -4,26 +4,31 @@
 
 # Introduction 
 
-This documentation provides an overview of the Generalized Quantum Episodic Memory (GQEM) model and its implementation in the Julia package `QuantumEpisodicMemoryModels`. The GQEM is a quantum model of item recognition memory which accounts for subadditivity (a.k.a. overdispersion) and violations of the law of total probability. In what follows, we will introduce the task, the mechanics of the model, and illustrate some basic functionality using `QuantumEpisodicMemoryModels`.
+This page provides an overview of the Generalized Quantum Episodic Memory (GQEM) model and its implementation in the Julia package `QuantumEpisodicMemoryModels`. The GQEM is a quantum model of recognition memory which accounts for phenomena that pose challenges to many alternative models. These phenomena include subadditivity (a.k.a. overdispersion) and violations of the law of total probability (LOTP). In what follows, we will introduce a recognition memory task used to study subaddivity and violations of the LOTP, the mechanics of the GQEM model, and illustrate some basic functionality provided by this package.
 
 # Task
 
 In the recognition memory task, participants study a list of items (e.g., pictures or words) during the learning phase. Subsequently, in the test phase, participants distinguish between previously studied items and two types of new items. The three item types are:
 
-1.  $O$: old items defined as items in the study list
-2.  $R$: new items that are related any item in the study list
-3.  $U$: new items that are not related to any items in the study list 
+1.  $O$: an old item defined as an item in the study list
+2.  $R$: a new item defined as an item that is related an item in the study list
+3.  $U$: a new item that is not related to any items in the study list 
 
 Particpants complete the test phase under one of three between-subject conditions:
 
 1.  $V$: respond *yes* to old items (verbatim)
 2.  $G$: respond *yes* to new, related items (gist)
 3.  $V \cup G$: respond *yes* to old items or new, related items (verbatim + gist)
+4.  $U$: respond *yes* to new, unrelated items (unrelated)
 
-
-## Law of Total Probability
 
 ## Subadditivity
+
+Classical probability theory requires mutually exclusive and exhaustive events to sum to 1. In the recognition memory task above, subjects are instructed to respond *yes* to items in three mutually exclusive and exhaustive categories: gist (G), verbatim (V), and new unrelated (U). Thus, for a given item type $i \in \{O,R,U \}$, the judgments summed across the three conditions should be: 
+
+$\Pr(Y_G = 1 \mid i) + \Pr(Y_V = 1 \mid i) + \Pr(Y_U = 1 \mid i) = 1$
+
+Subadditivity, which occurs when the sum exceeds 1, is frequently observed in recognition memory decisions.
 
 # Model Description
 
@@ -59,7 +64,7 @@ Upon viewing an old, new related, or new unrelated items a person enters a super
 
 ## Parameters
 
-The GQEM consists of 5 angle parameters which describe the relationship between the standard basis ``\boldsymbol{\chi}_V = \{ \ket{V} = [1,0]^{\top}, \ket{V}^{\perp} = [0,1]^{\top} \}`` and other two bases and the three state vectors. The parameters are defined as follows:
+The GQEM consists of 5 parameters which describe the angle between the standard basis ``\boldsymbol{\chi}_V = \{ \ket{V} = [1,0]^{\top}, \ket{V}^{\perp} = [0,1]^{\top} \}`` and other two bases and the three state vectors. The parameters are defined as follows:
 
 1. ``\theta_G``: angle between basis ``\boldsymbol{\chi}_V`` and ``\boldsymbol{\chi}_G`` in radians
 2. ``\theta_U``: angle between basis ``\boldsymbol{\chi}_V`` and ``\boldsymbol{\chi}_U`` in radians
@@ -69,7 +74,7 @@ The GQEM consists of 5 angle parameters which describe the relationship between 
 
 ## Response Probabilities
 
-The purpose of this section is to provide a geometric illustration of computing response probabilities with the GQEM model. In the code block below, we will begin by setting the value for each parameter.
+The purpose of this section is to provide a geometric illustration of computing response probabilities with the GQEM model. In the code block below, we will begin by setting the value for each parameter, and creating a model object.
 ```@example model 
 θG = -.5
 θU = 2
@@ -82,10 +87,34 @@ Next, we pass the parameters to the GQEM constructor as keyword arguments (order
 dist = GQEM(; θG, θU, θψO, θψR, θψU)
 ```
 
-The figure below illustrates how response probabilities are generated from the GQEM model. 
+The figure below illustrates geometrically how response probabilities are generated from the GQEM model. In this example, we assume that a person was placed in the gist condition, and is in a superposition state for related new items, $\ket{\psi_R}$. The probability of responding *yes* is found by projecting $\ket{\psi_R}$ onto the basis vector $\ket{G}$. In the figure below, the red vector represents the superposition state $\ket{\psi_R}$, the green vector represents the projection of $\ket{\psi_R}$ onto $\ket{G}$ and the dashed black line is perpendicular to the projection. 
 
 ```@example model
 plot(dist, θψR, θG; state_label = L"\psi_R")
+```
+
+```@raw html
+<details>
+<summary><b>Show Details </b></summary>
+```
+The superposition state for related items is obtained by rotating the verbatim basis vector.
+
+$\ket{\psi_R} = \mathbb{U}(\theta_{\psi_R}) \ket{V}$
+
+Similarly, the basis state for gist instructions is obtained by rotating the verbatim basis vector.
+
+$\ket{G} = \mathbb{U}(\theta_{G}) \ket{V}$
+
+The projector matrix for basis vector $\ket{G}$ is defined as:
+
+$\mathbf{P} = \ket{G} \bra{G}$
+
+The probability of responding *yes* given a related word is defined as the squared magnitude of the projection of $\ket{\psi_R}$ onto $\ket{G}$:
+
+$\Pr(X = 1 \mid R) = \lVert \mathbf{P} \ket{\psi_R} \rVert^2$
+
+```@raw html
+</details>
 ```
 
 # Model Usage
@@ -102,7 +131,7 @@ preds = compute_preds(dist) |> to_table
 ```
 ### Subadditivity 
 
-The predictions for subadditivity can be computed by summing across the item times for each instruction condition. Below, the model predicts subadditivity for verbatim and unrelated new items, but not old items. 
+Below, the model predicts subadditivity for verbatim and unrelated new items, but not old items. 
 
 ```@example model 
 sum(preds[["gist", "verbatim", "unrelated new"],:], dims = 1)

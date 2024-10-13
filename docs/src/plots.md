@@ -12,6 +12,7 @@ The first step is to load the required packages. You will need to install each p
 environment in order to run the code locally. We will also set a random number generator so that the results are reproducible.
 
 ```@example plot
+using LaTeXStrings
 using QuantumEpisodicMemory
 using Plots
 ```
@@ -20,13 +21,14 @@ using Plots
 
 In the code block below, we define a GQEM model. 
 ```@example plot
-model = GQEM(; 
+parms = (
     θG = -.5,
     θU = 2,
     θψO = .90,
     θψR = .10,
     θψU = -1.5,
 )
+model = GQEM(; parms...)
 ```
 
 ## Generate Plot
@@ -53,6 +55,12 @@ The projectors are denoted by a dashed black line. By contrast, the projections 
 
 ```@example plot
 plot(model)
+```
+
+You can also generate a prediction plot for a single condition by specifing the state vector angle and the basis vector angle (relative to the verbatim basis). In the example below, ``\ket{\psi_R}`` is projected onto $\ket{G}$.
+
+```@example plot
+plot(model, parms.θψR, parms.θG; state_label = L"\psi_R")
 ```
 
 # References 
