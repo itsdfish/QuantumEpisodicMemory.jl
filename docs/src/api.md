@@ -25,4 +25,5 @@ to_table
 
 ```@docs
 plot
+plot_predictions
 ```

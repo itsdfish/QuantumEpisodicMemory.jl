@@ -64,14 +64,17 @@ import Distributions: rand
 
 export AbstractGQEM
 export GQEM
+
+export compute_preds
 export pdf
 export loglikelihood
 export logpdf
+export plot_predictions
 export rand
-export compute_preds
 export to_table
 
 include("structs.jl")
 include("functions.jl")
 include("utilities.jl")
+include("ext_functions.jl")
 end

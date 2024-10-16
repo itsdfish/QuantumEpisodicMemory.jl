@@ -7,6 +7,7 @@ using QuantumEpisodicMemory
 
 import Plots: plot
 import Plots: plot!
+import QuantumEpisodicMemory: plot_predictions
 
 using QuantumEpisodicMemory: 𝕦
 
@@ -278,6 +279,118 @@ end
 function make_circle(r)
     θ = LinRange(0, 2 * π, 500)
     return @. r * sin(θ), r * cos(θ)
+end
+
+"""
+    plot_predictions(
+        preds::Matrix{<:Matrix{<:Real}}`,
+        responses::Vector{<:Int},
+        n_trials::Int;
+        row_labels = ["Gist", "Verbatim", "Gist+Verbatim", "Unrelated"],
+        col_labels = ["Old", "Related", "Unrelated"],
+        kwargs...
+    )
+
+Generates a plot of posterior or prior predictive distributions for each condition. 
+
+# Arguments
+
+- `preds::Matrix{<:Matrix{<:Real}}`: predictions for the GQEM where each sub-matrix is contains the predictions across all conditions
+    for a single simulation
+- `responses::Matrix{<:Int}`: a matrix of *yes* responses where rows correspond to instruction conditions, and columns correspond
+        to word types
+- `n_trials::Int`: the number of trials per condition.
+
+# Keywords
+
+- `row_labels = ["Gist", "Verbatim", "Gist+Verbatim", "Unrelated"]`: row labels for the grid plot 
+- `col_labels = ["Old", "Related", "Unrelated"]`: column labels of the grid plot
+- `kwargs...`: optional keyword options passed to override default values for `histogram`
+"""
+function plot_predictions(
+    preds::Matrix{<:Matrix{<:Real}},
+    responses::Matrix{<:Integer},
+    n_trials::Int;
+    row_labels = ["Gist", "Verbatim", "Gist+Verbatim", "Unrelated"],
+    col_labels = ["Old", "Related", "Unrelated"],
+    kwargs...
+)
+    preds = stack(preds, dims = 3)
+    n_rows = 5
+    n_cols = 4
+    p = plot(
+        legend = false,
+        layout = grid(
+            n_rows,
+            n_cols,
+            heights = compute_weights(n_rows),
+            widths = compute_weights(n_cols)
+        ),
+        #bottom_margin=[-5mm -5mm],
+        margin = 0.25Plots.cm,
+        size = (800, 600),
+        dpi = 300,
+    )
+
+    [
+        plot!(
+            p[r, 1],
+            (0, 0),
+            xlimits = (-0.1, 0.1),
+            ylimits = (-0.1, 0.1),
+            grid = false,
+            axis = ([], false)
+        ) for r ∈ 1:n_rows
+    ]
+    [
+        plot!(
+            p[1, c],
+            (0, 0),
+            xlimits = (-1, 1),
+            ylimits = (-1, 1),
+            grid = false,
+            axis = ([], false)
+        ) for c ∈ 1:n_cols
+    ]
+    [
+        histogram!(
+            p[r + 1, c + 1],
+            preds[r, c, :],
+            xlims = (0, 1),
+            ylims = (0, 20),
+            leg = false,
+            grid = false,
+            color = RGB(123 / 256, 156 / 256, 126 / 256),
+            norm = true
+        ) for r ∈ 1:(n_rows - 1), c ∈ 1:(n_cols - 1)
+    ]
+
+    data_probs = responses ./ n_trials
+    data_probs = data_probs'[:]
+    i = 1
+    for r ∈ 2:n_rows, c ∈ 2:n_cols
+        vline!(p[r, c], [data_probs[i]], color = :black, linewidth = 2)
+        i += 1
+    end
+    [
+        annotate!(
+            p[i, 1],
+            0.0,
+            0.0,
+            text(row_labels[i - 1], 10, :center, :center, rotation = 90)
+        ) for i ∈ 2:n_rows
+    ]
+    [
+        annotate!(p[1, i], 0.0, 0.0, text(col_labels[i - 1], 10, :center, :center)) for
+        i ∈ 2:n_cols
+    ]
+    return p
+end
+
+function compute_weights(n)
+    w = [0.01, fill(0.99, n)...]
+    weights = w ./ sum(w)
+    [1.0 - sum(weights[2:end]), weights[2:end]...]
 end
 
 end

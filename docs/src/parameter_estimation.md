@@ -149,6 +149,26 @@ pairplot(chains, PairPlots.Truth(parms))
 
 ![](assets/pairplots.png)
 
+### Posterior Predictive Distributions 
+
+Finally, we will evaluate the descriptive adequacy of the GQEM by comparing the posterior predictive distributions to the generated data. The first step is to create a new Turing model to generate predictions from the posterior distribution. In the code block below, we asign the Turing model to the keyword `model`, we assign a function to that normalizes the predictions to keyword `func`, and set the number of samples to the number of trials per condition.
+
+```julia
+pred_model =
+    predict_distribution(GQEM; model = model(data), func = x -> x ./ n_trials, n_samples = n_trials)
+```
+The next step is to sample from the posterior predictive distribution. The output is a matrix of matrices, where each submatrix is a prediction for each condition. 
+
+```julia 
+post_preds = generated_quantities(pred_model, chains)
+```
+In the code block below, we plot the posterior predictive distribution for each condition and plot the generated data as a black, vertical line. In all cases, the distributions are centered near the data, indicating the model can reproduce the pattern observed in the data.
+```julia
+plot_predictions(post_preds, responses, n_trials)
+```
+![](assets/posterior_predictive_distribution.png)
+
+
 # References
 
 Trueblood, J. S., & Hemmer, P. (2017). The generalized quantum episodic memory model.
