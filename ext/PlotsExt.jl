@@ -362,7 +362,7 @@ function plot_predictions(
             grid = false,
             color = RGB(123 / 256, 156 / 256, 126 / 256),
             norm = true
-        ) for r ∈ 1:(n_rows-1), c ∈ 1:(n_cols-1)
+        ) for r ∈ 1:(n_rows - 1), c ∈ 1:(n_cols - 1)
     ]
 
     data_probs = responses ./ n_trials
