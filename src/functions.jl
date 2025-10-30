@@ -17,6 +17,23 @@ columns correspond to word type:
 # Arguments
 
 - `dist::AbstractGQEM`: a GQEM distribution object
+
+# Example
+
+```julia 
+using QuantumEpisodicMemory
+
+# basis rotation parameters relative to the standard verbatim basis, V
+θG = -.12
+θU = -1.54
+θψO = -.71
+θψR = -.86
+θψU = 1.26
+
+dist = GQEM(; θG, θU, θψO, θψR, θψU)
+preds = compute_preds(dist)
+preds = to_table(preds)
+```
 """
 function compute_preds(dist::AbstractGQEM{T}) where {T}
     (; θG, θU, θψO, θψR, θψU) = dist
@@ -109,6 +126,23 @@ columns correspond to word type:
 # Arguments
 
 - `dist::AbstractGQEM`: a GQEM distribution object
+
+# Example 
+
+```julia 
+using QuantumEpisodicMemory
+
+# basis rotation parameters relative to the standard verbatim basis, V
+θG = -.12
+θU = -1.54
+θψO = -.71
+θψR = -.86
+θψU = 1.26
+
+dist = GQEM(; θG, θU, θψO, θψR, θψU)
+data = rand(dist, 100)
+table = to_table(data)
+```
 """
 function rand(dist::AbstractGQEM, n::Array{Int, N}) where {N}
     preds = compute_preds(dist)
@@ -141,6 +175,23 @@ columns correspond to word type:
 - `dist::AbstractGQEM`: a GQEM distribution object
 - `n::Union{Int, Array{Int, N}}`: the number of trials 
 - `data::Array{Int, N}`: number of "yes" responses 
+
+# Example 
+
+```julia 
+using QuantumEpisodicMemory
+
+# basis rotation parameters relative to the standard verbatim basis, V
+θG = -.12
+θU = -1.54
+θψO = -.71
+θψR = -.86
+θψU = 1.26
+
+dist = GQEM(; θG, θU, θψO, θψR, θψU)
+data = rand(dist, 100)
+logpdf(dist, 100, data)
+```
 """
 function logpdf(
     dist::AbstractGQEM,
@@ -148,10 +199,10 @@ function logpdf(
     data::Array{Int, N}
 ) where {N}
     preds = compute_preds(dist)
-    return sum(@. logpdf(Binomial(n, preds), data))
+    return @. logpdf(Binomial(n, preds), data)
 end
 
-loglikelihood(dist::AbstractGQEM, data::Tuple) = logpdf(dist, data...)
+loglikelihood(dist::AbstractGQEM, data::Tuple) = sum(logpdf(dist, data...))
 
 """
     pdf(dist::AbstractGQEM, n::Union{Int,Array{Int,N}}, data::Array{Int,N})
@@ -174,13 +225,30 @@ columns correspond to word type:
 - `dist::AbstractGQEM`: a GQEM distribution object
 - `n::Union{Int, Array{Int, N}}`: the number of trials 
 - `data::Array{Int, N}`: number of "yes" responses 
+
+# Example 
+
+```julia 
+using QuantumEpisodicMemory
+
+# basis rotation parameters relative to the standard verbatim basis, V
+θG = -.12
+θU = -1.54
+θψO = -.71
+θψR = -.86
+θψU = 1.26
+
+dist = GQEM(; θG, θU, θψO, θψR, θψU)
+data = rand(dist, 100)
+pdf(dist, 100, data)
+```
 """
 function pdf(
     dist::AbstractGQEM,
     n::Union{Int, Array{Int, N}},
     data::Array{Int, N}
 ) where {N}
-    return logpdf(dist, n, data) |> exp
+    return exp.(logpdf(dist, n, data))
 end
 
 """
@@ -203,14 +271,30 @@ end
 Converts matrix to table with labeled dimensions and indices. 
 
 # Example
+
+```julia 
+using QuantumEpisodicMemory
+
+# basis rotation parameters relative to the standard verbatim basis, V
+θG = -.12
+θU = -1.54
+θψO = -.71
+θψR = -.86
+θψU = 1.26
+
+dist = GQEM(; θG, θU, θψO, θψR, θψU)
+data = rand(dist, 100)
+to_table(data)
+```
+
 ```julia
-4×3 Named Matrix{Float64}
+4×3 Named Matrix{Int64}
 condition ╲ word type │       old    related  unrelated
 ──────────────────────┼────────────────────────────────
-gist                  │  0.690462   0.545336  0.0359636
-verbatim              │  0.575113   0.425675   0.093524
-gist + verbatim       │  0.694898   0.551852  0.0497793
-unrelated new         │  0.455457   0.604619   0.887783
+gist                  │        65         51          2
+verbatim              │        66         41          9
+gist+verbatim         │        58         52          5
+unrelated new         │        50         57         91
 ```
 """
 function to_table(x)
